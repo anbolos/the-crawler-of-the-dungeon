@@ -1054,6 +1054,7 @@ def open_shop():
 ## MISC FUNCTIONS ##
 
 def remove_events(event):
+  # Prevents overlaps in events
   convert_to_tuple(player.position1,player.position2)
   if player_position_tuple in event:
     event.remove((player.position1,player.position2))

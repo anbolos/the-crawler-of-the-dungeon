@@ -56,7 +56,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Fog of war!
 - Story lines (it is skipped if skip_story == True in line 1074)
 ### Changed
-- Shop system
+- Shop system tweaks and bug fixes
 
 ## - 2020-5-31
 ### Added
