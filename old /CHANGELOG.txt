@@ -1,0 +1,173 @@
+# changelog from 2020-5-25 to 2020-6-9
+# move along, everything is rewritten more nicely in CHANGELOG.md
+
+6/9/20
+  Player and stat progression!
+  Changes to outline function
+  BUGS:
+  Item choices disappear if you backspace [FIXED]
+  There is a very small chance the player will never get a key, or will have no keys by the time they discover the boss room
+
+6/7/20
+  Removed hallways to prevent misalignment of rooms
+  Added markers to treasure chests
+  Added more helper functions
+  Fixed shop
+  Game loop works
+  TODO:
+  Add player progression (Levels,EXP,stat buffs) [DONE 6/9]
+  More story elements
+  More dungeons and monsters
+  More items 
+    Better swords that increase critical hits
+    More potions?
+  Ability to defend against attacks
+  Dream features:
+  More random dungeon layouts
+    Floors
+  A blacksmith where you can craft your own weapons from items found in a dungeon AND/OR
+
+  A place where you can train your skills:
+  Strength: determines chance of critical hit, along with the damage
+  Attack Technique: determines chance of stronger attack [there is current a weak,base, and strong attack]
+  attack = [baseAtk-1,baseAtk,baseAtk+1]
+  Defense Technique: determines defense level
+  Once you clear the first dungeon the blacksmith can help you learn how to defend
+
+  layout/blacksmith lines can be 
+
+  "Hey NAME, I see that you have started to fight monsters for the Knights of Arion, eh? I used to be a blacksmith for them a long time ago."
+
+  "I could teach you a few tricks and techniques, to better equip you for battle. For a start, let me teach you the basic techniques of defending. It will be your best weapon against death."
+
+  "I've seen too many young squires swinging their swords like it is some kind of axe. That is why we train them through proper technique, until they become good enough serve the kingdom of Arion ."
+
+  "I don't know why they would send someone like you out to fight monsters for them without proper training. But, I guess it was fate for me to teach you."
+  ==================================================
+  THE BLACKSMITH
+
+  Skill points: 1230 (It could maybe cost gold instead)
+
+  STRENGTH: |⬜|⬜|  |  |  |  |  |  |  |
+  Gives you +0.2% chance of hitting critical
+  UPGRADE FOR x SKILL POINTS
+
+  ATTACK TECH: |⬜|⬜|⬜|  |  |  |  |  |
+  Gives you +0.4% chance of hitting a strong attack
+  -+0.4% chance of hitting a weak attack
+  UPGRADE FOR x SKILL POINTS
+
+  DEFENSE TECH: |  |  |  |  |  |  |  |  |
+  Gives you the ability to defend against monster attacks
+  UPGRADE FOR FREE
+  ==================================================
+
+  What would you like to do? [1] UPGRADE [2] LEAVE BLACKSMITH
+
+  This gives me ideas on his background and story
+    he was once a blacksmith for the knights of Arion
+    he wants you to become the strongest, but is that what you desire to do? to become a monster slayer?
+    can monsters become our friend instead of our foe?
+    is there more to the fighting between the monsters and the humans?
+    i kind of want to focus on individuality
+
+6/5/20
+  Added 'read' function to handle story elements of game
+  Continued to add game lines to narrator_lines
+  Added treasure chests and traps!
+    Made sure events don't overlap
+  key chance drop increased from 66% to 75%
+  BUGS:
+    Dungeon rooms don't align correctly (due to how undiscovered rooms have a specific amount of spaces that might not match the rooms length)
+    ex: undiscovered room     "     " 5 spaces
+        discovered room       "=[ - ]=" is longer than undiscovered room, so there is a slight shift
+    [FIXED]
+
+6/3/20
+  BUGS:
+  print corridors function isnt printing out all possible directios
+  [REMOVED]
+
+6/2/20
+  Function changes
+
+6/1/20
+  Fog of war! 
+  Finshed shop system
+  Added new story elements
+
+5/31/20
+  Started to create a shop system
+  TODO:
+  Finish the shop system [DONE 6/1]
+  Polish the code
+  Find better ways to execute the logic of the game
+  Once that's all done,
+    We can add: 
+    Fog of war! (This could make the dungeon a little more interesting) [A bit excited so went ahead to do it 6/1]
+    A defending system
+    Different regions all with different dungeons and monsters
+    More items 
+    Player level system, along with player progression
+    Add a blacksmith (crafting)
+
+5/30/20
+  Increased key dropChance to 2/3
+  Tweaked stats
+  Fixed inventory bugs
+    Equip and unquip item functions are now separate
+  Created the ability to unlock rooms (RIGID, NEEDS TUNING)
+  Boss fights are back on
+  TODO (High priority and probably last things to work on):
+  Implement traps and treasure chests [DONE]
+    make sure they do not overlap monsters and eachother
+  Get better writing in-game
+  Polish the key and locked rooms system
+    Find a more effecient way?
+  Add a fog of war? [DONE]
+  Add a shop [DONE]
+  Add level and monster progression
+    Different regions?
+
+5/29/20
+  Removed boss class
+  Tweaked combat system to have a more accurate critical hit system
+  TODO:
+    BUGS:
+    Polish equip item function
+    Player cant unequip item when their inventory is empty
+    (FIXED 5/30)
+    Which item? message duplicates as player gets more items (FIXED)
+    Player cant equip SLIME SWORD (FIXED)
+    After inputting an invalid input, once you type a valid input it refreshes itself instead of executing actions (FIXED)
+
+5/28/20
+  Created the inventory actions
+  TODO:
+  Polish the equip actions (IN PROGRESS)
+  Fix inventory bugs
+    Need to check if item can be consumed or equipped (DONE 5/29)
+  Start to work on exclusive item drops for specific types of monsters and boss
+  Start to add back the boss fight with the new key item
+
+5/27/20
+  Implemented print_new_lines functions
+  After many trial and errors, there is a working item drop system
+  TODO:
+  Work on inventory actions
+    Use [DONE 5/28]
+    equip [DONE 5/28]
+    view [DONE 5/28]
+
+5/26/20
+  
+  TODO:
+  Fix player inventory (DONE 5/27)
+  Create the ability to equip or consume items (DONE 5/28)
+  Limit the amount of drops per monster to 2 (DONE 5/27)
+  
+5/25/20
+  New changelog!
+  TODO:
+  Move one-liners that don't include variables to narrator_lines (IN PROGRESS)
+  Make a new_line function that takes # of lines (DONE 5/27)

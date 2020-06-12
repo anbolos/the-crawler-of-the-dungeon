@@ -1,0 +1,66 @@
+# changelog from 2020-5-18 to 2020-5-24
+# move along, everything is rewritten more nicely in CHANGELOG.md
+# (A) developed by Anquilis 
+# (K) developed by PasterParish
+
+5/18/20
+  The Crawler of the Dungeon was born!
+5/19/20
+  Made a completely optional intro scene (A)
+  Added player/monster/boss objects
+  Added more text files
+5/20/20
+  Made map (K)
+  Made function to generate monster positions (K)
+    spawn_monsters
+  Made helper functions to construct game loop(A)
+    New player objects
+    print_dungeon
+    view_stats
+    getDirections
+    Picking actions
+5/21/20 
+  Finished the positioning system (A)
+    Restricts user from going out of bounds
+    Mostly hard-coded
+  Renamed functions
+  Created player movement (K)
+    bug testing was key
+  Started to add monster detection/combat (A)
+5/22/20
+  Created cleaner narrator line system (A)
+  BUG: check_invalid_inputs will always print out 'Invalid Action' line the first timeeven though player picked a valid option, disabled function (FIXED)
+  Started to create monster attack system and death condition (A)
+  Cleaned up and consoldidated code (A)
+  OPPORTUNITY: Made deal_monster_attack into deal_attack for universal use (A)
+  Finished attack system (A)
+  Started on boss fight (A)
+    
+  SUGGESTIONS for next day:
+      add lines to narrator on boss key [Canceled]
+      record last positions of user to prevent two messages saying "You walked into a room with sticks and bones" after defeating monster
+      polish the code its messy
+
+5/23/20
+  Tweaks and bug fixes
+  Created inventory system (K)
+    Potions!
+  Created enemy_encounter function for dual use in boss and monster fights (A)
+  Finished boss fight system (A)
+  TCotD is now in ALPHA (whatever that means)
+  SUGGESTIONS for next day:
+    Clean code, think of ways to simplify it or just rework it in the future [Work in progress]
+    Find a way to make equal spacing [Work in progress]
+    Track which rooms the player has been [Delayed]
+    Remove narrator lines that need looping, we have a solution to get rid of it thanks to Kevin 
+    read_text("Hi" + str(player.name)) [Fixed]
+  
+  Currently finding a way to mask all the new_lines by putting them in functions
+  BUGS: 
+  When in the boss room, it shows "=[ X ]=" instead of intended marker with boss [Fixed]
+  When at the entrance of the boss room, you can go out of bounds
+  Interface is uneven [Work in progress]
+
+5/24/20
+  Tweaks (A)
+    Cleaned up code
