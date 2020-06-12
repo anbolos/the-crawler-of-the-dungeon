@@ -11,8 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [0.1] - 2020-6-12
 ### Added
 - Version control!
-- This new, more organized changelog (now in markdown)
+- This new, more organized changelog file! (now in markdown)
 - Concpets file to plan out different features
+- A code directory in the readme file
 
 ## [NOTE] All changes before 2020-6-12 can not be reversed 
 ### All changes descibed below can be more vague than current versions
