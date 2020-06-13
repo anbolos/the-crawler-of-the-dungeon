@@ -14,6 +14,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - This new, more organized changelog file! (now in markdown)
 - Concpets file to plan out different features
 - A code directory in the readme file
+- A 'print_dropped_items' check if the player defeats a monster at the gate of the boss room and drops an item
+### Changed
+- Placed 'dungeon = generate_dungeon()' line in game loop so that all discovered tiles from last dungeon reverts back to an undiscovered tile, which is blank
+- Tweaked the stat_progression function where the player is restored to full HP once they level up
+- The shop will now refresh once the player executes an action and cleans up the console
+- Boss_position is now just a tuple value, not a tuple within a list (see below)
+### Fixed
+- Where player could enter the boss room without unlocking the gate becuase 'boss_position not in locked_positions' returned True when it should return False 
 
 ## [NOTE] All changes before 2020-6-12 can not be reversed 
 ### All changes descibed below can be more vague than current versions

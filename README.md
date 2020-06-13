@@ -63,7 +63,7 @@ https://github.com/Anquilis/the-crawler-of-the-dungeon
 
 ## TECHNICAL STUFF
 
-- This game uses sy sos time math random 
+- This game uses the sy, os, time, math, and random modules built-in into python
 
 - I'm planning to split up the main.py file into smaller chunks (for each class) as suggested
 
@@ -84,7 +84,7 @@ https://github.com/Anquilis/the-crawler-of-the-dungeon
 
 - As for now, I will keep this directory to hopefully guide contributers and code reviews in the main.py file
 
-- Anything in ** bold ** are functions for the player exclusively 
+- Anything in **bold** are functions for the player exclusively 
 
 (Lines 4-28) imported modules and global variables
 
@@ -104,17 +104,17 @@ and
 
 (347-419) dungeon creation/priting and event generator (which generates list of tuples)
 
-** (438-478) player inventory system **
+**(438-478) player inventory system**
 
-** (480-566) player movement system (includes safeguard to prevent player from going out of bounds) **
+**(480-566) player movement system (includes safeguard to prevent player from going out of bounds)**
 
 (568-573) check invalid inputs function (only checks for invalid number inputs)
 
-** (575-597) player progression and stat progression system ** 
+**(575-597) player progression and stat progression system** 
 
-** (599-649) actions player could make in or out of combat (functions to execute those actions are NOT included)**
+**(599-649) actions player could make in or out of combat (functions to execute those actions are NOT included)**
 
-** (655-842) actions player could make while in their inventory (functions to execute those actions are included) **
+**(655-842) actions player could make while in their inventory (functions to execute those actions are included)**
 
 (861-944) combat system
 
@@ -126,7 +126,7 @@ and
 
 - skip story variable disables all the story elements, including the introduction
 
-(1089-1162) ** Main loop, uses all functions above**
+**(1089-1162) Main loop, uses all functions above**
 
-(1166-1178) ** Player death screen **
+**(1166-1178) Player death screen **
 

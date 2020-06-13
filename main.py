@@ -35,7 +35,7 @@ monster_positions = []
 treasure_positions = []
 trap_positions = []
 locked_positions = [(3,4)]
-boss_position = [(3,4)]
+boss_position = (3,4)
 
 # Stores all the monsters in the game
 
@@ -305,6 +305,12 @@ def read_text(str):
       pause(0.04)
     sys.stdout.write(letter)
     sys.stdout.flush()
+  
+def read(lines,start,end):
+  for i in range(start,end+1):
+    read_text(lines[i])
+    pause(1)
+    clear()    
 
 def get_player_info():
   # Asks for player name and hometown
@@ -362,8 +368,6 @@ def generate_dungeon():
   temp_row = []
   return dungeon
 
-dungeon = generate_dungeon()
-
 def print_dungeon(dungeon):
   global treasure_positions
   # Prints out dungeon
@@ -379,7 +383,7 @@ def print_dungeon(dungeon):
         if row == 3 and col == 3:
           temp_row += "[ X ]️🗝️"
         elif row == 3 and col == 4:
-          temp_row += "  [ X  ☠ ]"
+          temp_row += " [ X  ☠ ]"
         else:
           temp_row += "[ X ]"
       else:
@@ -417,12 +421,6 @@ def spawn_events(number_of_loops,list1):
     list1.append(temp_position)
     x += 1
   return list1
-  
-def read(lines,start,end):
-  for i in range(start,end+1):
-    read_text(lines[i])
-    pause(1)
-    clear()
 
 def view_stats(name,currentHP,maxHP,baseAtk,isPlayer,level ="none",currentXP="none",baseXP="none"):
   # Views stats for player, monster, and boss
@@ -431,9 +429,9 @@ def view_stats(name,currentHP,maxHP,baseAtk,isPlayer,level ="none",currentXP="no
     print(name,"   LVL",level,"   XP",currentXP,"/",baseXP,"    HP",currentHP,"/",maxHP,"    ATK",baseAtk,end = '')
     outline(55)
   else:
-    outline(30)
+    outline(45)
     print(name,"    HP",currentHP,"/",maxHP,"    ATK",baseAtk,end = '')
-    outline(30)
+    outline(45)
 
 def add_item(item):
   # Does not place duplicates of items
@@ -533,7 +531,7 @@ def get_directions(row,col):
   check_invalid_input(player.posDirections)
   chosen_direction = player.posDirections[player_input-1]
   print_new_lines(1)
-  if row == 3 and col == 3 and chosen_direction == "RIGHT" and key not in player.inventory and (3,4) in locked_positions:
+  if row == 3 and col == 3 and chosen_direction == "RIGHT" and key not in player.inventory and boss_position in locked_positions:
     read_text("You will need a key to unlock the gate.")
   elif row == 3 and col == 3 and chosen_direction == "RIGHT" and boss_position in locked_positions:
     read_text("Use the key to unlock the gate.")
@@ -587,6 +585,7 @@ def player_progression(monsterXP):
 
 def stat_progression():
   player.maxHP += 1
+  player.currentHP = player.maxHP
   print_new_lines(2)
   if player.level % 2 == 0 and player.level != 2:
     player.baseAtk += 1
@@ -643,7 +642,7 @@ def inactive_actions():
       in_monster_fight = True
       # Prevents the player from encountering the same monster once defeated
       monster_positions.remove(player_position_tuple)
-    elif player_position_tuple in boss_position:
+    elif player_position_tuple == boss_position:
       in_boss_fight = True
   elif player_input == 2: #VIEW INVENTORY
     view_inventory()
@@ -1031,6 +1030,7 @@ def shop_actions():
 def open_shop():
   global in_shop
   # TODO: Simplify this function
+  read_text("What can I get you?")
   while in_shop == True:
     print_new_lines(1)
     outline(40)
@@ -1049,6 +1049,9 @@ def open_shop():
       read_text("You have " + str(player.gold) +" GOLD.")
       outline(40)
       shop_actions()
+      pause(2)
+      clear()
+      pause(2)
 
 
 ## MISC FUNCTIONS ##
@@ -1087,6 +1090,8 @@ else:
 # Runs game until player has died
 
 while game_state == True and player_died == False:
+  # Resets dungeon
+  dungeon = generate_dungeon()
   # Spawns 5 monsters
   monster_positions = spawn_events(5,monster_positions)
   # Spawns 2 treasure chests
@@ -1110,12 +1115,17 @@ while game_state == True and player_died == False:
     elif in_boss_fight == True:
       boss = boss_list[boss_index]
       enemy_encounter("BOSS",boss.name,boss.attack,boss.currentHP,boss.maxHP,boss.baseAtk,boss.critPercentage)
+    elif player.position1 == 3 and player.position2 == 3:
+      # Prints dropped items if monster happens to be at the boss gate
+      if has_dropped_item == True and flg1 == True:
+        print_dropped_items(monster.name)
+        remove_events(treasure_positions)
+        print_new_lines(2)
+      # Prints gate to the boss
+      read_text("You find yourself in a room with a locked gate in the east side. Something is locked in there, you thought. You hear a low, rumbling sound on the other side.")
     elif has_dropped_item == True and flg1 == True:
       print_dropped_items(monster.name)
       remove_events(treasure_positions)
-    elif player.position1 == 3 and player.position2 == 3:
-      # Prints gate to the boss
-      read_text("You find yourself in a room with a locked gate in the east side. Something is locked in there, you thought. You hear a low, rumbling sound on the other side.")
     elif (player.position1,player.position2) in treasure_positions:
       read_text("You walk in to find a treasure chest right in the middle of the room. It appears to be locked.")
       # Prevents user from finding a treasure chest, open it, and then stumble across a trap
