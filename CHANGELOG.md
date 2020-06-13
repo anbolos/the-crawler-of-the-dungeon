@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - The program will crash if the player inputs a letter, a space, or any kind of special character (kept for debgugging)
 - When at the entrance of the boss room (3,3), you can go out of bounds
 
+## [0.2] - 2020-6-13
+### Removed
+- 'in_boss_fight' variable
 
 ## [0.1] - 2020-6-12
 ### Added

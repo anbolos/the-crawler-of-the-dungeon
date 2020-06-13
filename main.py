@@ -23,7 +23,6 @@ player_equipped = False
 # Or if it is in a inventory or shop
 # Set it all to FALSE
 in_monster_fight = False
-in_boss_fight = False
 in_inventory = False
 in_shop = False
 
@@ -273,7 +272,7 @@ narrator_lines.shop = [
 ## HELPER FUNCTIONS ##
 
 
-## AESTHETIC FUNCTIONS ##
+## VISUAL FUNCTIONS ##
 
 
 def print_new_lines(num):
@@ -403,10 +402,7 @@ def print_dungeon(dungeon):
 def spawn_events(number_of_loops,list1):
   # Creates spawn positions for monsters, traps, and treasure and puts it in a list
   # Reccomended number of loops are 8
-  # X number_of_loops == X monsters
-  global monster_positions
-  global trap_positions
-  global treasure_positions
+  # X number_of_loops == X monsters/treasure/trap
   list1 = []
   x = 0
   while x < number_of_loops:
@@ -489,7 +485,6 @@ def get_directions(row,col):
   # Takes in player's positions and prints out possible directions
   # Checks where player can go and prevents them from going out of bounds
   global player_input
-  global in_boss_fight
   UP = player.directions[0]
   DOWN = player.directions[1]
   LEFT = player.directions[2]
@@ -610,14 +605,16 @@ def active_actions():
   check_invalid_input(player.inactiveActions)
   if player_input == 1: # ATTACK
     deal_attack("PLAYER",player.name,player.attack,player.baseAtk,player.critPercentage)
-    if in_monster_fight == True:
+    if in_monster_fight == True and (player.position1,player.position2) in monster_positions:
       check_currentHP("MONSTER")
       if in_monster_fight == False: #IF MONSTER DIED
         print_victory_message(monster.name,earnedGold,monster.XP)
+        # Prevents the player from encountering the same monster once defeated
+        monster_positions.remove(player_position_tuple)
         player_progression(monster.XP)
-    elif in_boss_fight == True:
+    elif in_monster_fight == True and (player.position1,player.position2) == boss_position:
       check_currentHP("BOSS")
-      if in_boss_fight == False: #IF BOSS DIED
+      if in_monster_fight == False: #IF BOSS DIED
         print_victory_message(boss.name,earnedGold,boss.XP)
         player_progression(boss.XP)
     print_new_lines(1)
@@ -626,7 +623,6 @@ def active_actions():
 
 def inactive_actions():
   global in_monster_fight
-  global in_boss_fight
   global player_input
   global monster_positions
   global player_input
@@ -640,10 +636,8 @@ def inactive_actions():
       # Checks if player positions is equal to a monster position in a list, which will trigger 
     if player_position_tuple in monster_positions:
       in_monster_fight = True
-      # Prevents the player from encountering the same monster once defeated
-      monster_positions.remove(player_position_tuple)
     elif player_position_tuple == boss_position:
-      in_boss_fight = True
+      in_monster_fight = True
   elif player_input == 2: #VIEW INVENTORY
     view_inventory()
 
@@ -842,8 +836,7 @@ def inventory_actions():
     
 def choose_action():
   global in_monster_fight
-  global in_boss_fight
-  if in_monster_fight == True or in_boss_fight == True: 
+  if in_monster_fight == True: 
   # Prints actions while in battle
     active_actions()
   elif in_inventory == True:
@@ -884,9 +877,9 @@ def deal_attack(player1,player1name,player1attack,player1baseAtk,player1critPerc
     read_text("The " + player1name + " dealt " + str(player1_attack) + " damage to you!")
   elif player1 == "PLAYER": 
     # Prints what the player dealt to monster or boss
-    if in_monster_fight == True: # DEALS ATTACK TO MONSTER
+    if in_monster_fight == True and (player.position1,player.position2) in monster_positions: # DEALS ATTACK TO MONSTER
       monster.currentHP = monster.currentHP - player1_attack
-    elif in_boss_fight == True: # DEALS ATTACK TO BOSS
+    elif in_monster_fight == True and (player.position1,player.position2) == boss_position: # DEALS ATTACK TO BOSS
       boss.currentHP = boss.currentHP - player1_attack
     read_text("You dealt " + str(player1_attack) + " damage to it!")
     pause(2)
@@ -895,7 +888,6 @@ def check_currentHP(name):
   global game_state
   global in_dungeon
   global in_monster_fight
-  global in_boss_fight
   global turns_taken
   global player_died
   global monster_list
@@ -926,7 +918,7 @@ def check_currentHP(name):
   elif name == "BOSS": #IF BOSS DIES
     if boss.currentHP <= 0:
       # Takes player out of battle and of dungeon
-      in_boss_fight = False
+      in_monster_fight = False
       in_dungeon = False
       # Adds 1 to monsters killed and player gains gold
       player.monstersKilled += 1 
@@ -1108,11 +1100,11 @@ while game_state == True and player_died == False:
   while in_dungeon == True and player_died == False:
     print_dungeon(dungeon)
   # MONSTER FIGHTING SYSTEM
-    if in_monster_fight == True:
+    if in_monster_fight == True and (player.position1,player.position2) in monster_positions:
       monster = monster_list[monster_index]
       enemy_encounter("MONSTER",monster.name,monster.attack,monster.currentHP,monster.maxHP,monster.baseAtk,monster.critPercentage)
       remove_events(trap_positions)
-    elif in_boss_fight == True:
+    elif in_monster_fight == True and (player.position1,player.position2) == boss_position:
       boss = boss_list[boss_index]
       enemy_encounter("BOSS",boss.name,boss.attack,boss.currentHP,boss.maxHP,boss.baseAtk,boss.critPercentage)
     elif player.position1 == 3 and player.position2 == 3:
@@ -1175,11 +1167,11 @@ while game_state == True and player_died == False:
 
 if player_died == True:
   # You have died
-  pause(2)
+  pause(1)
   read_text(narrator_lines.dead[0])
   print_narrator_verdict()
   # Prints final stats
-  read_text("You cleared " + str(player.dungeonsCleared) + " dungeons and killed " + str(player.monstersKilled) + "  monsters. You were a Lvl "+ str(player.level) +" " + str(player.type) + " that had a maxHP of " + str(player.maxHP) + " and a baseAtk of " + str(player.attack[1]) + ".")
+  read_text("You cleared " + str(player.dungeonsCleared) + " dungeons and killed " + str(player.monstersKilled) + " monsters. You were a Lvl "+ str(player.level) +" " + str(player.type) + " that had a maxHP of " + str(player.maxHP) + " and a baseAtk of " + str(player.attack[1]) + ".")
   print_new_lines(1)
   # If your want to contuinue your journey
   # You must start a new game
