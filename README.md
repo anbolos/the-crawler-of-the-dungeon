@@ -128,5 +128,5 @@ and
 
 **(1089-1162) Main loop, uses all functions above**
 
-**(1166-1178) Player death screen **
+**(1166-1178) Player death screen**
 
