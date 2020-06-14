@@ -1,15 +1,8 @@
+
+import math,random
+from visual import print_new_lines,pause,clear,outline,read_text,read
+
 ## GLOBAL VARIABLES ##
-
-
-import sys
-import os
-import time
-import math
-import random
-
-
-## GAME BOOLEANS ##
-
 
 # Checks if a player is in a dungeon or has died
 # Or equipped an item
@@ -40,7 +33,7 @@ boss_position = (3,4)
 
 class Items:
   '''Represents Items'''
-  def __init__(self,name,desc,dropChance,buff,buffName,value,consumable,equippable,itemId,quantity,shopQuantity):
+  def __init__(self,name,desc,dropChance,buff,buffName,value,consumable,equippable,quantity,shopQuantity,itemId):
     self.name = name
     self.description = desc
     self.dropChance = dropChance
@@ -49,9 +42,9 @@ class Items:
     self.value = value
     self.consumable = consumable
     self.equippable = equippable
-    self.itemId = itemId
     self.quantity = quantity
     self.shopQuantity = shopQuantity
+    self.itemId = itemId
 
 woodenSword = Items(
   "WOODEN SWORD",
@@ -63,8 +56,8 @@ woodenSword = Items(
   False,
   True,
   0,
-  0,
-  2
+  2,
+  0
 )
 healthPotion = Items(
   "HEALTH POTION",
@@ -75,9 +68,9 @@ healthPotion = Items(
   20,
   True,
   False,
-  1,
   0,
-  3
+  3,
+  1
 )
 key = Items(
   "KEY",
@@ -88,9 +81,9 @@ key = Items(
   20,
   True,
   False,
-  2,
   0,
-  3
+  3,
+  2
 )
 
 cheapSword = Items(
@@ -102,9 +95,9 @@ cheapSword = Items(
   80,
   False,
   True,
-  4,
   0,
-  1
+  1,
+  3
 )
 
 # Items that are exclusive to a specific type of monster
@@ -117,9 +110,9 @@ slimeSword = Items(
   50,
   False,
   True,
-  3,
   0,
-  0
+  0,
+  4
 )
 
 drop_list = []
@@ -270,46 +263,6 @@ narrator_lines.shop = [
 ]
 
 ## HELPER FUNCTIONS ##
-
-
-## VISUAL FUNCTIONS ##
-
-
-def print_new_lines(num):
-  for i in range(0,num):
-      print("\n", end='')
-
-def pause(x):
-  time.sleep(x)
-
-def clear():
-  os.system('clear')
-
-def outline(x):
-  temp_row = ""
-  for x in range(0,x):
-    temp_row += "="
-  print_new_lines(1)
-  print(temp_row,end='')
-  print_new_lines(1)
-
-# Created by Jan Vorcak from Stack Overflow
-def read_text(str):
-  # Creates a "typewriter" effect while printing out a str
-  # Note: Player can type anything while this function is still executing
-  for letter in str:
-    if letter in [",", ".", "!"]:
-      pause(0.3)
-    else:
-      pause(0.04)
-    sys.stdout.write(letter)
-    sys.stdout.flush()
-  
-def read(lines,start,end):
-  for i in range(start,end+1):
-    read_text(lines[i])
-    pause(1)
-    clear()    
 
 def get_player_info():
   # Asks for player name and hometown
