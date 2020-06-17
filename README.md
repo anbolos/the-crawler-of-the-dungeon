@@ -80,9 +80,17 @@ https://github.com/Anquilis/the-crawler-of-the-dungeon
 
 - Game uses global variables to dictate the game logic, but I'm planning to remove it to save memory and put it all in some kind of class 
 
-### DIRECTORY
+### DIRECTORY 
 
-- As for now, I will keep this directory to hopefully guide contributers and code reviews in the main.py file
+## visual.py
+
+- Holds all cosmetic functions for the game
+
+## dungeon.py
+
+- Holds all functions of dungeon and event (monster,treasure, and trap) creation
+
+## main.py (Needs update)
 
 - Anything in **bold** are functions for the player exclusively 
 
@@ -92,17 +100,9 @@ https://github.com/Anquilis/the-crawler-of-the-dungeon
 
 (200-205) all created monsters and bosses
 
-(279-307) visual functions
-and
-(421-425) 'read' function
-and
-(427-436) 'view stats' function
-
 (309-323) getting player info and introduction functions
 
 (337-345) Function to convert player's positions into a tuple (used to trigger events)
-
-(347-419) dungeon creation/priting and event generator (which generates list of tuples)
 
 **(438-478) player inventory system**
 

@@ -1,4 +1,3 @@
-## VISUAL FUNCTIONS ##
 
 import time,os,sys
 
@@ -37,3 +36,14 @@ def read(lines,start,end):
     read_text(lines[i])
     pause(1)
     clear()    
+
+def view_stats(name,currentHP,maxHP,baseAtk,isPlayer,level ="none",currentXP="none",baseXP="none"):
+  # Views stats for player, monster, and boss
+  if isPlayer == True:
+    outline(55)
+    print(name,"   LVL",level,"   XP",currentXP,"/",baseXP,"    HP",currentHP,"/",maxHP,"    ATK",baseAtk,end = '')
+    outline(55)
+  else:
+    outline(55)
+    print(name,"    HP",currentHP,"/",maxHP,"    ATK",baseAtk,end = '')
+    outline(55)
