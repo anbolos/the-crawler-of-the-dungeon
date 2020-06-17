@@ -7,10 +7,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - The program will crash if the player inputs a letter, a space, or any kind of special character (kept for debgugging)
 - When at the entrance of the boss room (3,3), you can go out of bounds
 
-## [0.3] - 2020-6-13
+## [0.4] - 2020-6-17
 ### Added
-- 'game' folder
-- 'visual.py' file, holding all 'visual' functions
+- 'dungeon.py' file, holds all dungeon/event creation
+- 'view_stats' function in 'visual.py' file
+- 'ask_for_direction' function to shorten 'get_direction' function
+### Changed
+- Code arrangement
+- Added several new parameters to 'print_dungeon' function to prevent errors on 'dungeon.py' file 
+- Some parameter names in 'dungeon.py' file
+### Removed
+- 'convert_to_tuple' function
+
+## [0.3] - 2020-6-14
+### Added
+- 'visual.py' file, holds all cosmetic functions (excluding dungeon visual)
 
 ## [0.2] - 2020-6-13
 ### Removed

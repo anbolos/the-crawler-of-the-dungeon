@@ -1,8 +1,15 @@
 
 import math,random
-from visual import print_new_lines,pause,clear,outline,read_text,read
+
+from visual import print_new_lines, pause, clear, outline,read_text, read, view_stats
+
+from dungeon import generate_dungeon, print_dungeon,generate_events, remove_events
+
+
 
 ## GLOBAL VARIABLES ##
+# TODO: Remove all global variables from functions
+
 
 # Checks if a player is in a dungeon or has died
 # Or equipped an item
@@ -160,8 +167,6 @@ player.gold = 0
 # Set to (4,0)
 player.position1 = 4 # Row
 player.position2 = 0 # Col
-# Used to compare player position to monster positions
-player_position_tuple = (player.position1,player.position2)
 player.posDirectionKeys = [] # Possible player input
 player.posDirections = [] # Possible directions
 player.directions = ["UP","DOWN","LEFT","RIGHT"]
@@ -262,7 +267,11 @@ narrator_lines.shop = [
   "You have no gold. You are broke." #2
 ]
 
-## HELPER FUNCTIONS ##
+
+
+## PROLOGUE FUNCTIONS ##
+
+
 
 def get_player_info():
   # Asks for player name and hometown
@@ -289,103 +298,10 @@ def play_prologue():
   pause(2)
   
 
-## GAMEPLAY FUNCTIONS ##
+
+## PLAYER INVENTORY SYSTEM ##
 
 
-def convert_to_tuple(row,col):
-  # Converts player positions into a tuple
-  # Used later to check whether the player enounters a monseter
-  # TODO: Make it return the tuple
-  global player_position_tuple
-  temp_list = list(player_position_tuple)
-  temp_list[0] = row
-  temp_list[1] = col
-  player_position_tuple = tuple(temp_list)
-
-def generate_dungeon():
-  # TODO: Add parameters to customize dungeon size and randomize the position of the boss room
-  global dungeon
-  dungeon = []
-  temp_row = []
-  for row in range(0,4):
-    for col in range(0,4):
-      i = 0
-      temp_row.append(i)
-      if row == 3 and col == 3:
-        temp_row.append(0)
-    dungeon.append(temp_row)
-    temp_row = []
-  temp_row.append(0)
-  dungeon.append(temp_row)
-  temp_row = []
-  return dungeon
-
-def print_dungeon(dungeon):
-  global treasure_positions
-  # Prints out dungeon
-  outline(30)
-  print("THE DUNGEON")
-  print_new_lines(1)
-  temp_row = ""
-  for row in range(0,len(dungeon)):
-    for col in range(0,len(dungeon[row])):
-      if row == player.position1 and col == player.position2:
-        dungeon[row][col] = 1
-        # Prints an "X" marking where the player is on the dungeon
-        if row == 3 and col == 3:
-          temp_row += "[ X ]️🗝️"
-        elif row == 3 and col == 4:
-          temp_row += " [ X  ☠ ]"
-        else:
-          temp_row += "[ X ]"
-      else:
-        if dungeon[row][col] == 0:
-          temp_row += "     "
-        elif (row,col) in treasure_positions:
-          temp_row += "[ 🗝️ ]"
-        elif row == 3 and col == 3:
-          temp_row += "[ - ]🗝️"
-        else:
-          temp_row += "[ - ]"
-    print(temp_row)
-    temp_row = ""
-  outline(30)
-  print_new_lines(1)
-
-def spawn_events(number_of_loops,list1):
-  # Creates spawn positions for monsters, traps, and treasure and puts it in a list
-  # Reccomended number of loops are 8
-  # X number_of_loops == X monsters/treasure/trap
-  list1 = []
-  x = 0
-  while x < number_of_loops:
-    temp_position = 0 
-    position1 = random.randint(0,3)
-    position2 = random.randint(0,3)
-    # TODO: Make sure events don't overlap
-    while (position1,position2) in list1:
-      position1 = random.randint(0,3)
-      position2 = random.randint(0,3)
-    temp_position = (position1,position2)
-    list1.append(temp_position)
-    x += 1
-  return list1
-
-def view_stats(name,currentHP,maxHP,baseAtk,isPlayer,level ="none",currentXP="none",baseXP="none"):
-  # Views stats for player, monster, and boss
-  if isPlayer == True:
-    outline(55)
-    print(name,"   LVL",level,"   XP",currentXP,"/",baseXP,"    HP",currentHP,"/",maxHP,"    ATK",baseAtk,end = '')
-    outline(55)
-  else:
-    outline(45)
-    print(name,"    HP",currentHP,"/",maxHP,"    ATK",baseAtk,end = '')
-    outline(45)
-
-def add_item(item):
-  # Does not place duplicates of items
-  if item not in player.inventory:
-    player.inventory.append(item)
 
 def view_inventory():
   global item_list
@@ -424,179 +340,49 @@ def view_inventory():
   else:
     inventory_actions()
 
-def append_posDirections(direction1 = "None",direction2 = "None",direction3 = "None",direction4 = "None"):
-  # Appends given directions into possible directions list
-  # Used to append them on console
-  possible_directions = [direction1,direction2,direction3,direction4]
-  for direction in possible_directions:
-    if direction == "None":
-      continue
+def inventory_actions():
+  # Executes all the actions the player can make when they are in their inventoyr
+  global in_inventory 
+  global player_input
+  global player_item
+  in_inventory = True
+  while in_inventory == True:
+    # Goes back to other actions if the inventory is empty
+    if len(player.inventory) == 0 and len(player.hand) == 0:
+      in_inventory = False
+      choose_action()
     else:
-      player.posDirections.append(direction)
-
-def get_directions(row,col):
-  # Takes in player's positions and prints out possible directions
-  # Checks where player can go and prevents them from going out of bounds
-  global player_input
-  UP = player.directions[0]
-  DOWN = player.directions[1]
-  LEFT = player.directions[2]
-  RIGHT = player.directions[3]
-  print_new_lines(1)
-  player.posDirections = []
-  player.posDirectionKeys = []
-  if row == 4 and col == 0:
-    #SPAWN POINT (UP)
-    append_posDirections(UP)
-  elif row == 3 and col == 3:
-    #GATE TO BOSS ROOM (UP,LEFT,RIGHT)
-    append_posDirections(UP,LEFT,RIGHT)
-  elif row == 0 and col == 0:
-    #TOP LEFT CORNER (DOWN, RIGHT)
-    append_posDirections(DOWN,RIGHT) 
-  elif row == 0 and col == 3:
-    #TOP RIGHT CORNER (DOWN, LEFT)
-    append_posDirections(DOWN,LEFT)
-  elif row != 0 and row != 4 and col == 0:
-    #LEFT SIDE (UP,DOWN,RIGHT)
-    append_posDirections(UP,DOWN,RIGHT)
-  elif row == 0 and col in [1,2]:
-    #TOP SIDE (DOWN, LEFT, RIGHT)
-    append_posDirections(DOWN,LEFT,RIGHT)
-  elif row == 3 and col in [1,2,3]:
-    #BOTTOM SIDE (UP,LEFT, RIGHT)
-    append_posDirections(UP,LEFT,RIGHT)
-  elif row != 0 and row != 3 and col in [3]:
-    #RIGHT SIDE (UP, DOWN, LEFT)
-    append_posDirections(UP,DOWN,LEFT)
-  else:
-    #IN THE MIDDLE
-    append_posDirections(UP,DOWN,LEFT,RIGHT)
-  for i in range(0,len(player.posDirections)-1):
-      player.posDirectionKeys.append(i+1)
-  read_text(narrator_lines.general[2]) # Which way?
-  print_actions(player.posDirections)
-  check_invalid_input(player.posDirections)
-  chosen_direction = player.posDirections[player_input-1]
-  print_new_lines(1)
-  if row == 3 and col == 3 and chosen_direction == "RIGHT" and key not in player.inventory and boss_position in locked_positions:
-    read_text("You will need a key to unlock the gate.")
-  elif row == 3 and col == 3 and chosen_direction == "RIGHT" and boss_position in locked_positions:
-    read_text("Use the key to unlock the gate.")
-  elif row == 3 and col == 3 and chosen_direction == "RIGHT" and boss_position not in locked_positions:
-    read_text("Get ready...")
-    player_movement(chosen_direction)
-  else:
-    check_invalid_input(player.posDirections)
-    player_movement(chosen_direction)
-  pause(.8)
-
-def player_movement(direction):
-  if direction == "UP":
-    player.position1 += -1
-  elif direction == "DOWN":
-    player.position1 += 1
-  elif direction == "LEFT":
-    player.position2 += -1
-  elif direction == "RIGHT":
-    player.position2 += 1  
-  
-def print_actions(player_action):
-  global player_input
-  # Prints all actions player can make
-  i = 1
-  for action in player_action:
-    print("[" + str(i) + "] " + action, end = ' ')
-    i += 1
-  print_new_lines(1)
-  player_input = int(input(""))
-
-def check_invalid_input(player_action = "None"):
-  global player_input
-  # Checks for invalid integer inputs
-  while player_input > len(player_action) or player_input < 1:
-    read_text(narrator_lines.general[1])
-    player_input = int(input(" "))
-
-def player_progression(monsterXP):
-  player.currentXP += monsterXP
-  pause(1.5)
-  if player.currentXP >= player.baseXP:
-      player.level += 1
+      read_text(narrator_lines.general[0]) # What to do?
       print_new_lines(2)
-      read_text("You leveled up! You are now a Lvl "+ str(player.level) +" "+ str(player.type) +"!")
-      remainder = player.currentXP - player.baseXP
-      player.currentXP = 0 + remainder
-      player.baseXP = nextLevel(player.level)
-      stat_progression()
-  pause(1)
-
-def stat_progression():
-  player.maxHP += 1
-  player.currentHP = player.maxHP
-  print_new_lines(2)
-  if player.level % 2 == 0 and player.level != 2:
-    player.baseAtk += 1
-    player.attack = [player.baseAtk-1,player.baseAtk,player.baseAtk+1]
-    read_text("Your maxHP grew to "+ str(player.maxHP) +" and your baseAtk increased by one!")
-  else:
-    read_text("Your maxHP grew to "+ str(player.maxHP) +"!")
-  pause(1)
-
-def active_actions():
-  global monster_fight
-  global player_input
-  global monster_list
-  global monster_index
-  global boss_list
-  global boss_index
-  monster = monster_list[monster_index]
-  boss = boss_list[boss_index]
-  # Executes actions player can make during combat
-  read_text(narrator_lines.general[0]) # What to do?
-  print_actions(player.activeActions)
-  check_invalid_input(player.inactiveActions)
-  if player_input == 1: # ATTACK
-    deal_attack("PLAYER",player.name,player.attack,player.baseAtk,player.critPercentage)
-    if in_monster_fight == True and (player.position1,player.position2) in monster_positions:
-      check_currentHP("MONSTER")
-      if in_monster_fight == False: #IF MONSTER DIED
-        print_victory_message(monster.name,earnedGold,monster.XP)
-        # Prevents the player from encountering the same monster once defeated
-        monster_positions.remove(player_position_tuple)
-        player_progression(monster.XP)
-    elif in_monster_fight == True and (player.position1,player.position2) == boss_position:
-      check_currentHP("BOSS")
-      if in_monster_fight == False: #IF BOSS DIED
-        print_victory_message(boss.name,earnedGold,boss.XP)
-        player_progression(boss.XP)
-    print_new_lines(1)
-  elif player_input == 2: # VIEW INVENTORY
-    view_inventory()
-
-def inactive_actions():
-  global in_monster_fight
-  global player_input
-  global monster_positions
-  global player_input
-  # Executes actions player can make during exploring a dungeon
-  read_text(narrator_lines.general[0]) # What to do?
-  print_actions(player.inactiveActions)
-  check_invalid_input(player.inactiveActions)
-  if player_input == 1: #MOVE
-    get_directions(player.position1,player.position2)  
-    convert_to_tuple(player.position1,player.position2)
-      # Checks if player positions is equal to a monster position in a list, which will trigger 
-    if player_position_tuple in monster_positions:
-      in_monster_fight = True
-    elif player_position_tuple == boss_position:
-      in_monster_fight = True
-  elif player_input == 2: #VIEW INVENTORY
-    view_inventory()
-
-
-## INVENTORY ACTIONS ##
-
+      print_actions(player.inventoryActions)
+      check_invalid_input(player.inventoryActions)
+      if player_input == 1: # USE ITEM 
+        if check_player_inventory(True,False):
+          print_items(True,False,False,player.inventory)
+          use_item(player_item)
+        else:
+          read_text("You have no items that can be used.")
+          print_new_lines(1)
+      elif player_input == 2: # VIEW ITEM 
+        print_items(False,False,True,player.inventory)
+        view_item(player_item)
+      elif player_input == 3: # EQUIP ITEM
+        if check_player_inventory(False,True):
+          print_items(False,True,False,player.inventory)
+          equip_item(player_item)
+        else:
+          read_text("You have no items that can be equipped.")
+          print_new_lines(1)
+      elif player_input == 4: # UNEQUIP ITEM
+        if len(player.hand) == 1:
+          unequip_item(player_item)
+        else:
+          read_text("You have nothing in your hand.")
+          print_new_lines(1)
+      elif player_input == 5: # EXIT INVENTORY
+        in_inventory = False
+        choose_action()
+      print_new_lines(1)
 
 def check_player_inventory(condition1,condition2):
   # Filters specific items for the player to use
@@ -627,7 +413,6 @@ def print_items(condition1,condition2,condition3,list1):
   player_item = player.posItems[player_input-1]
   player.posItems = []
 
-
 def use_item(player_item):
   global player_position_tuple
   global locked_positions
@@ -648,9 +433,8 @@ def use_item(player_item):
     # Note: There is only one locked position in the game
     # This checks if player is on (3,3)
     # This function converts the tuple to (3,4)
-    convert_to_tuple(player.position1,player.position2+1)
-    if player_position_tuple in locked_positions:
-      locked_positions.remove(player_position_tuple)
+    if (player.position1,player.position2+1) in locked_positions:
+      remove_events(player.position1,player.position2,locked_positions)
       print_new_lines(1)
       read_text("You succussfully unlocked the gate!")
       player_item.quantity += -1
@@ -743,49 +527,189 @@ def unequip_item(player_item):
     read_text("You now unequipped the " + str(player_item.name) + ".")
     print_new_lines(1)
 
-def inventory_actions():
-  # Executes all the actions the player can make when they are in their inventoyr
-  global in_inventory 
-  global player_input
-  global player_item
-  in_inventory = True
-  while in_inventory == True:
-    # Goes back to other actions if the inventory is empty
-    if len(player.inventory) == 0 and len(player.hand) == 0:
-      in_inventory = False
-      choose_action()
+
+
+## PLAYER DIRECTION SYSTEM ##
+
+
+
+def append_posDirections(direction1 = "None",direction2 = "None",direction3 = "None",direction4 = "None"):
+  # Appends given directions into possible directions list
+  # Used to append them on console
+  possible_directions = [direction1,direction2,direction3,direction4]
+  for direction in possible_directions:
+    if direction == "None":
+      continue
     else:
-      read_text(narrator_lines.general[0]) # What to do?
+      player.posDirections.append(direction)
+
+def get_directions(row,col):
+  # Takes in player's positions and prints out possible directions
+  # Checks where player can go and prevents them from going out of bounds
+  UP = player.directions[0]
+  DOWN = player.directions[1]
+  LEFT = player.directions[2]
+  RIGHT = player.directions[3]
+  print_new_lines(1)
+  player.posDirections = []
+  player.posDirectionKeys = []
+  if row == 4 and col == 0:
+    #SPAWN POINT (UP)
+    append_posDirections(UP)
+  elif row == 3 and col == 3:
+    #GATE TO BOSS ROOM (UP,LEFT,RIGHT)
+    append_posDirections(UP,LEFT,RIGHT)
+  elif row == 0 and col == 0:
+    #TOP LEFT CORNER (DOWN, RIGHT)
+    append_posDirections(DOWN,RIGHT) 
+  elif row == 0 and col == 3:
+    #TOP RIGHT CORNER (DOWN, LEFT)
+    append_posDirections(DOWN,LEFT)
+  elif row != 0 and row != 4 and col == 0:
+    #LEFT SIDE (UP,DOWN,RIGHT)
+    append_posDirections(UP,DOWN,RIGHT)
+  elif row == 0 and col in [1,2]:
+    #TOP SIDE (DOWN, LEFT, RIGHT)
+    append_posDirections(DOWN,LEFT,RIGHT)
+  elif row == 3 and col in [1,2,3]:
+    #BOTTOM SIDE (UP,LEFT, RIGHT)
+    append_posDirections(UP,LEFT,RIGHT)
+  elif row != 0 and row != 3 and col in [3]:
+    #RIGHT SIDE (UP, DOWN, LEFT)
+    append_posDirections(UP,DOWN,LEFT)
+  else:
+    #IN THE MIDDLE
+    append_posDirections(UP,DOWN,LEFT,RIGHT)
+  for i in range(0,len(player.posDirections)-1):
+      player.posDirectionKeys.append(i+1)
+  ask_for_direction(row,col)
+
+def ask_for_direction(row,col):
+  global player_input
+  read_text(narrator_lines.general[2]) # Which way?
+  print_actions(player.posDirections)
+  check_invalid_input(player.posDirections)
+  chosen_direction = player.posDirections[player_input-1]
+  print_new_lines(1)
+  # Checks if player is at boss gate
+  if row == 3 and col == 3 and chosen_direction == "RIGHT" and key not in player.inventory and boss_position in locked_positions:
+    read_text("You will need a key to unlock the gate.")
+  elif row == 3 and col == 3 and chosen_direction == "RIGHT" and boss_position in locked_positions:
+    read_text("Use the key to unlock the gate.")
+  elif row == 3 and col == 3 and chosen_direction == "RIGHT" and boss_position not in locked_positions:
+    read_text("Get ready...")
+    player_movement(chosen_direction)
+  else:
+    check_invalid_input(player.posDirections)
+    player_movement(chosen_direction)
+  pause(.8)
+
+def player_movement(direction):
+  if direction == "UP":
+    player.position1 += -1
+  elif direction == "DOWN":
+    player.position1 += 1
+  elif direction == "LEFT":
+    player.position2 += -1
+  elif direction == "RIGHT":
+    player.position2 += 1  
+
+
+
+# PLAYER AND STAT PROGRESSION
+
+
+
+def player_progression(monsterXP):
+  player.currentXP += monsterXP
+  pause(1.5)
+  if player.currentXP >= player.baseXP:
+      player.level += 1
       print_new_lines(2)
-      print_actions(player.inventoryActions)
-      check_invalid_input(player.inventoryActions)
-      if player_input == 1: # USE ITEM 
-        if check_player_inventory(True,False):
-          print_items(True,False,False,player.inventory)
-          use_item(player_item)
-        else:
-          read_text("You have no items that can be used.")
-          print_new_lines(1)
-      elif player_input == 2: # VIEW ITEM 
-        print_items(False,False,True,player.inventory)
-        view_item(player_item)
-      elif player_input == 3: # EQUIP ITEM
-        if check_player_inventory(False,True):
-          print_items(False,True,False,player.inventory)
-          equip_item(player_item)
-        else:
-          read_text("You have no items that can be equipped.")
-          print_new_lines(1)
-      elif player_input == 4: # UNEQUIP ITEM
-        if len(player.hand) == 1:
-          unequip_item(player_item)
-        else:
-          read_text("You have nothing in your hand.")
-          print_new_lines(1)
-      elif player_input == 5: # EXIT INVENTORY
-        in_inventory = False
-        choose_action()
-      print_new_lines(1)
+      read_text("You leveled up! You are now a Lvl "+ str(player.level) +" "+ str(player.type) +"!")
+      remainder = player.currentXP - player.baseXP
+      player.currentXP = 0 + remainder
+      player.baseXP = nextLevel(player.level)
+      stat_progression()
+  pause(1)
+
+def stat_progression():
+  player.maxHP += 1
+  player.currentHP = player.maxHP
+  print_new_lines(2)
+  if player.level % 2 == 0 and player.level != 2:
+    player.baseAtk += 1
+    player.attack = [player.baseAtk-1,player.baseAtk,player.baseAtk+1]
+    read_text("Your maxHP grew to "+ str(player.maxHP) +" and your baseAtk increased by one!")
+  else:
+    read_text("Your maxHP grew to "+ str(player.maxHP) +"!")
+  pause(1)
+
+
+
+## PLAYER ACTIONS (ACTIVE, INACTIVE) ##
+
+
+
+def print_actions(player_action):
+  global player_input
+  # Prints all actions player can make
+  i = 1
+  for action in player_action:
+    print("[" + str(i) + "] " + action, end = ' ')
+    i += 1
+  print_new_lines(1)
+  player_input = int(input(""))
+
+def active_actions():
+  global monster_fight
+  global player_input
+  global monster_list
+  global monster_index
+  global boss_list
+  global boss_index
+  monster = monster_list[monster_index]
+  boss = boss_list[boss_index]
+  # Executes actions player can make during combat
+  read_text(narrator_lines.general[0]) # What to do?
+  print_actions(player.activeActions)
+  check_invalid_input(player.inactiveActions)
+  if player_input == 1: # ATTACK
+    deal_attack("PLAYER",player.name,player.attack,player.baseAtk,player.critPercentage)
+    if in_monster_fight == True and (player.position1,player.position2) in monster_positions:
+      check_currentHP("MONSTER")
+      if in_monster_fight == False: #IF MONSTER DIED
+        print_victory_message(monster.name,earnedGold,monster.XP)
+        # Prevents the player from encountering the same monster once defeated
+        remove_events(player.position1,player.position2,monster_positions)
+        player_progression(monster.XP)
+    elif in_monster_fight == True and (player.position1,player.position2) == boss_position:
+      check_currentHP("BOSS")
+      if in_monster_fight == False: #IF BOSS DIED
+        print_victory_message(boss.name,earnedGold,boss.XP)
+        player_progression(boss.XP)
+    print_new_lines(1)
+  elif player_input == 2: # VIEW INVENTORY
+    view_inventory()
+
+def inactive_actions():
+  global in_monster_fight
+  global player_input
+  global monster_positions
+  global player_input
+  # Executes actions player can make during exploring a dungeon
+  read_text(narrator_lines.general[0]) # What to do?
+  print_actions(player.inactiveActions)
+  check_invalid_input(player.inactiveActions)
+  if player_input == 1: #MOVE
+    get_directions(player.position1,player.position2)  
+      # Checks if player positions is equal to a monster position in a list, which will trigger 
+    if (player.position1,player.position2) in monster_positions:
+      in_monster_fight = True
+    elif (player.position1,player.position2) == boss_position:
+      in_monster_fight = True
+  elif player_input == 2: #VIEW INVENTORY
+    view_inventory()
     
 def choose_action():
   global in_monster_fight
@@ -800,7 +724,9 @@ def choose_action():
     inactive_actions()
 
 
-## MONSTER ATTACK SYSTEM ##
+
+## COMBAT SYSTEM ##
+
 
 
 def enemy_encounter(nameStr,enemyName,enemyAttack,enemyCurrentHP,enemyMaxHP,enemyBaseAtk,enemyCritPercentage):
@@ -887,6 +813,22 @@ def check_currentHP(name):
       player.dungeonsCleared += 1
       item_drop()    
 
+def print_victory_message(name,value,XP):
+  # Prints a victory message after player defeats a monster or boss
+  print_new_lines(2)
+  read_text("Great job! You defeated the " + str(name) + " and gained "+ str(XP) +" XP! You also gained " +  str(value) + " GOLD!!")
+
+
+
+## ITEM DROP SYSTEM ##
+
+
+
+def add_item(item):
+  # Does not place duplicates of items
+  if item not in player.inventory:
+    player.inventory.append(item)
+
 def item_drop():
   # TODO: Add exclusive item drops
   global has_dropped_item
@@ -938,10 +880,37 @@ def print_dropped_items(name):
   has_dropped_item = False
   flg1 = False
 
-def print_victory_message(name,value,XP):
-  # Prints a victory message after player defeats a monster or boss
-  print_new_lines(2)
-  read_text("Great job! You defeated the " + str(name) + " and gained "+ str(XP) +" XP! You also gained " +  str(value) + " GOLD!!")
+
+
+## SHOP SYSTEM ##
+
+
+
+def open_shop():
+  global in_shop
+  # TODO: Simplify this function
+  read_text("What can I get you?")
+  while in_shop == True:
+    print_new_lines(1)
+    outline(40)
+    print("THE SHOP")
+    print_new_lines(1)
+    for item in shop_items:
+      if item.shopQuantity <= 0:
+        print(str(item.name)+" [SOLD OUT]",end=" ")
+      else:  
+        print("x"+str(item.shopQuantity)+" "+str(item.name)+" ["+str(item.value)+" GOLD]",end=" ")
+      print_new_lines(2)
+    if player.gold == 0:
+      read_text(narrator_lines.shop[2])
+      in_shop = False
+    else:
+      read_text("You have " + str(player.gold) +" GOLD.")
+      outline(40)
+      shop_actions()
+      pause(2)
+      clear()
+      pause(2)
 
 def shop_actions():
   global in_shop
@@ -972,40 +941,27 @@ def shop_actions():
     print_new_lines(1)
     in_shop = False
 
-def open_shop():
-  global in_shop
-  # TODO: Simplify this function
-  read_text("What can I get you?")
-  while in_shop == True:
-    print_new_lines(1)
-    outline(40)
-    print("THE SHOP")
-    print_new_lines(1)
-    for item in shop_items:
-      if item.shopQuantity <= 0:
-        print(str(item.name)+" [SOLD OUT]",end=" ")
-      else:  
-        print("x"+str(item.shopQuantity)+" "+str(item.name)+" ["+str(item.value)+" GOLD]",end=" ")
-      print_new_lines(2)
-    if player.gold == 0:
-      read_text(narrator_lines.shop[2])
-      in_shop = False
-    else:
-      read_text("You have " + str(player.gold) +" GOLD.")
-      outline(40)
-      shop_actions()
-      pause(2)
-      clear()
-      pause(2)
 
 
 ## MISC FUNCTIONS ##
 
-def remove_events(event):
-  # Prevents overlaps in events
-  convert_to_tuple(player.position1,player.position2)
-  if player_position_tuple in event:
-    event.remove((player.position1,player.position2))
+
+
+def check_invalid_input(player_action = "None"):
+  global player_input
+  # Checks for invalid integer inputs
+  while player_input > len(player_action) or player_input < 1:
+    read_text(narrator_lines.general[1])
+    player_input = int(input(" "))
+
+def trigger_trap():
+  i = random.randint(0,len(narrator_lines.trap)-1)
+  damage = random.randint(1,4)
+  read_text("As soon as you walked in, "+narrator_lines.trap[i]+" ")
+  read_text("You got hurt and dealt "+ str(damage)+"!") 
+  player.currentHP += -damage
+  trap_positions.remove((player.position1,player.position2))
+  check_currentHP("PLAYER")
 
 def print_narrator_verdict():
   # Prints how well the player did after they died 
@@ -1017,7 +973,9 @@ def print_narrator_verdict():
     read(narrator_lines.dead,1,2)
 
 
+
 ## PROLOGUE ##
+
 
 
 skip_story = True
@@ -1030,19 +988,22 @@ else:
   player.name = "NONAME"
   player.hometown = "HOMETOWN"
 
+
+
 ##MAIN LOOP##
 
-# Runs game until player has died
 
+
+# Runs game until player has died
 while game_state == True and player_died == False:
   # Resets dungeon
   dungeon = generate_dungeon()
   # Spawns 5 monsters
-  monster_positions = spawn_events(5,monster_positions)
+  monster_positions = generate_events(5,monster_positions)
   # Spawns 2 treasure chests
-  treasure_positions = spawn_events(2,treasure_positions)
+  treasure_positions = generate_events(2,treasure_positions)
   # Spawns 2 traps
-  trap_positions = spawn_events(2,trap_positions)
+  trap_positions = generate_events(2,trap_positions)
   # You find yourself at an entrance of a dungeon
   if player.dungeonsCleared == 0 and skip_story == False:
     read(narrator_lines.story,0,7)
@@ -1051,7 +1012,7 @@ while game_state == True and player_died == False:
   flg1 = True
   print_new_lines(1)
   while in_dungeon == True and player_died == False:
-    print_dungeon(dungeon)
+    print_dungeon(dungeon,player.position1,player.position2,treasure_positions)
   # MONSTER FIGHTING SYSTEM
     if in_monster_fight == True and (player.position1,player.position2) in monster_positions:
       monster = monster_list[monster_index]
@@ -1064,26 +1025,19 @@ while game_state == True and player_died == False:
       # Prints dropped items if monster happens to be at the boss gate
       if has_dropped_item == True and flg1 == True:
         print_dropped_items(monster.name)
-        remove_events(treasure_positions)
+        remove_events(player.position1,player.position2,treasure_positions)
         print_new_lines(2)
       # Prints gate to the boss
       read_text("You find yourself in a room with a locked gate in the east side. Something is locked in there, you thought. You hear a low, rumbling sound on the other side.")
     elif has_dropped_item == True and flg1 == True:
       print_dropped_items(monster.name)
-      remove_events(treasure_positions)
+      remove_events(player.position1,player.position2,treasure_positions)
     elif (player.position1,player.position2) in treasure_positions:
       read_text("You walk in to find a treasure chest right in the middle of the room. It appears to be locked.")
       # Prevents user from finding a treasure chest, open it, and then stumble across a trap
-      remove_events(trap_positions)
+      remove_events(player.position1,player.position2,trap_positions)
     elif (player.position1,player.position2) in trap_positions:
-      i = random.randint(0,len(narrator_lines.trap)-1)
-      damage = random.randint(1,4)
-      read_text("As soon as you walked in, "+narrator_lines.trap[i]+" ")
-      read_text("You got hurt and dealt "+ str(damage)+" damage!")
-      # TODO: Print message of death from trap
-      player.currentHP += -damage
-      trap_positions.remove((player.position1,player.position2))
-      check_currentHP("PLAYER")
+      trigger_trap()
     else: 
       # You walk into empty room
       read_text(narrator_lines.inactive[0])
