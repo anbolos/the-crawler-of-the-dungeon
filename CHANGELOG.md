@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - 'dungeon.py' file, holds all dungeon/event creation
 - 'view_stats' function in 'visual.py' file
 - 'ask_for_direction' function to shorten 'get_direction' function
+- 'print_hand' function (states what your are equipped with at the start of the dungeon)
 ### Changed
 - Code arrangement
 - Added several new parameters to 'print_dungeon' function to prevent errors on 'dungeon.py' file 

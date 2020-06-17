@@ -27,6 +27,9 @@ in_inventory = False
 in_shop = False
 
 # Determines the next monster the player will encounter
+# TODO: Create dictionary of dungeons
+# EX: 1: [slime,skeleton]
+#     2: [differentMonster1]
 monster_index = 0
 boss_index = 0
 # Stores all the tuples for monster positions
@@ -963,6 +966,12 @@ def trigger_trap():
   trap_positions.remove((player.position1,player.position2))
   check_currentHP("PLAYER")
 
+def print_hand(player_hand):
+  if len(player_hand) == 0:
+    read_text("You enter the dark entrance of the dungeon with nothing in your hand.")
+  else:
+    read_text("You enter the dark entrance of the dungeon, wielding a " + str(player_hand[0].name) +" in your hand.")
+
 def print_narrator_verdict():
   # Prints how well the player did after they died 
   if player.dungeonsCleared <= 20:
@@ -990,30 +999,23 @@ else:
 
 
 
-##MAIN LOOP##
+## MAIN LOOP ##
 
 
 
 # Runs game until player has died
 while game_state == True and player_died == False:
-  # Resets dungeon
   dungeon = generate_dungeon()
-  # Spawns 5 monsters
   monster_positions = generate_events(5,monster_positions)
-  # Spawns 2 treasure chests
   treasure_positions = generate_events(2,treasure_positions)
-  # Spawns 2 traps
   trap_positions = generate_events(2,trap_positions)
-  # You find yourself at an entrance of a dungeon
   if player.dungeonsCleared == 0 and skip_story == False:
     read(narrator_lines.story,0,7)
-  if len(player.inventory) == 0:
-    read_text("You enter the dark entrance of the dungeon with nothing in your hand.")
+  print_hand(player.hand)
   flg1 = True
   print_new_lines(1)
   while in_dungeon == True and player_died == False:
     print_dungeon(dungeon,player.position1,player.position2,treasure_positions)
-  # MONSTER FIGHTING SYSTEM
     if in_monster_fight == True and (player.position1,player.position2) in monster_positions:
       monster = monster_list[monster_index]
       enemy_encounter("MONSTER",monster.name,monster.attack,monster.currentHP,monster.maxHP,monster.baseAtk,monster.critPercentage)
@@ -1034,7 +1036,7 @@ while game_state == True and player_died == False:
       remove_events(player.position1,player.position2,treasure_positions)
     elif (player.position1,player.position2) in treasure_positions:
       read_text("You walk in to find a treasure chest right in the middle of the room. It appears to be locked.")
-      # Prevents user from finding a treasure chest, open it, and then stumble across a trap
+      # Prevents user from finding a treasure chest and then stumble across a trap
       remove_events(player.position1,player.position2,trap_positions)
     elif (player.position1,player.position2) in trap_positions:
       trigger_trap()
@@ -1054,7 +1056,7 @@ while game_state == True and player_died == False:
 
   if in_dungeon == False and player_died == False:
     # Little congratulary message
-    boss = boss_list[0]
+    boss = boss_list[boss_index]
     read_text("You cleared the dungeon and killed the "+str(boss.name) +"! Well done!")
     pause(1)
     clear()
