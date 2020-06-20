@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - The program will crash if the player inputs a letter, a space, or any kind of special character (kept for debgugging)
 - When at the entrance of the boss room (3,3), you can go out of bounds
 
+## [0.5] - 2020-6-19
+### Fixed
+- A bug that would crash the gmae after encountering a monster
+
 ## [0.4] - 2020-6-17
 ### Added
 - 'dungeon.py' file, holds all dungeon/event creation

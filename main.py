@@ -1019,7 +1019,7 @@ while game_state == True and player_died == False:
     if in_monster_fight == True and (player.position1,player.position2) in monster_positions:
       monster = monster_list[monster_index]
       enemy_encounter("MONSTER",monster.name,monster.attack,monster.currentHP,monster.maxHP,monster.baseAtk,monster.critPercentage)
-      remove_events(trap_positions)
+      remove_events(player.position1,player.position2,trap_positions)
     elif in_monster_fight == True and (player.position1,player.position2) == boss_position:
       boss = boss_list[boss_index]
       enemy_encounter("BOSS",boss.name,boss.attack,boss.currentHP,boss.maxHP,boss.baseAtk,boss.critPercentage)
